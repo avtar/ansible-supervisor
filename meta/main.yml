@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: 'Avtar Gill'
+  company: OCAD University
+  license: Apache
+  min_ansible_version: 1.6
+  platforms:
+  - name: EL
+    versions:
+     - 6
+  categories:
+   - monitoring
+   - system
+dependencies: []

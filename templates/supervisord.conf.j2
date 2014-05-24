@@ -1,0 +1,24 @@
+[unix_http_server]
+file={{ supervisor_socket }}
+
+[supervisord]
+logfile={{ supervisor_log }} 
+logfile_maxbytes={{ supervisor_max_log_size }}
+logfile_backups={{ supervisor_log_backups }}
+loglevel=info
+pidfile={{ supervisor_pid_file }}
+nodaemon=false              
+minfds=1024 
+minprocs=200
+user=root
+
+; The section below must remain in the config file for RPC
+; (supervisorctl) to work.
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix://{{ supervisor_socket }}
+
+[include]
+files = {{ supervisor_app_config_dir }}/*.ini

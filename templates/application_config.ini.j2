@@ -1,0 +1,20 @@
+[program:{{ supervisor_app_name | mandatory }}]
+command={{ supervisor_app_command | mandatory }}             
+process_name={{ supervisor_app_process_name }}
+numprocs={{ supervisor_app_numprocs }}                    
+directory={{ supervisor_app_directory | mandatory }}               
+autostart={{ supervisor_app_autostart }}
+autorestart={{ supervisor_app_autorestart }}
+startsecs={{ supervisor_app_startsecs }}
+startretries={{ supervisor_app_startretries }}
+exitcodes=0,2
+user={{ supervisor_app_user | mandatory }}
+stdout_logfile={{ supervisor_app_log }}
+stdout_logfile_maxbytes={{ supervisor_app_max_log_size }}
+stdout_logfile_backups={{ supervisor_app_log_backups }}
+stderr_logfile={{ supervisor_app_error_log }}
+stderr_logfile_maxbytes={{ supervisor_app_max_log_size }}
+stderr_logfile_backups={{ supervisor_app_log_backups }}
+{% if supervisor_app_env_vars|length > 0 %}
+environment={% for name, var in supervisor_app_env_vars.iteritems() %}{{ name|upper }}="{{ var }}"{% if not loop.last %},{% endif%}{% endfor %}
+{% endif %}

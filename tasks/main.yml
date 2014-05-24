@@ -1,0 +1,102 @@
+---
+- name: Install dependencies
+  yum: >
+    name={{ item }}
+    state=present
+  with_items: supervisor_yum_packages
+  when: ansible_os_family == 'RedHat'
+  tags:
+    - install
+    - supervisor
+
+- name: Install Supervisord
+  pip: >
+    name=supervisor
+    version={{ supervisor_version }}
+  tags:
+    - install
+    - supervisor
+
+- name: Ensure log, config, and include directories exist
+  file: >
+    path={{ item }}
+    state=directory
+    mode=0755
+    owner=root
+    group=root
+  with_items:
+    - '{{ supervisor_log_dir }}'
+    - '{{ supervisor_config_dir }}'
+    - '{{ supervisor_app_config_dir }}'
+  tags:
+    - install
+    - supervisor
+
+- name: Create init script
+  template: >
+    src=supervisord.init
+    dest=/etc/init.d/supervisord
+    mode=0755
+    owner=root
+    group=root
+  tags:
+    - install
+    - supervisor
+
+- name: Create supervisord config file
+  template: >
+    src=supervisord.conf.j2
+    dest={{ supervisor_config_file }}
+    mode=0644
+    owner=root
+    group=root
+  notify: restart supervisord
+  tags:
+    - configure
+    - supervisor
+
+- name: Start and enable supervisord
+  service: name=supervisord state=started enabled=yes
+  tags:
+    - service
+    - supervisor
+
+
+# Monitored application
+# =====================
+
+- name: Ensure application log directory exists
+  file: >
+    path={{ supervisor_app_log_dir }}
+    state=directory
+    mode=0755
+    owner=root
+    group=root
+  tags:
+    - configure
+    - supervisor
+
+- name: Ensure application log files exist
+  file: >
+    path={{ item }}
+    state=touch
+    mode=0644
+    owner={{ supervisor_app_user }}
+  with_items:
+    - '{{ supervisor_app_log }}'
+    - '{{ supervisor_app_error_log }}'
+  tags:
+    - configure
+    - supervisor
+
+- name: Create application config file
+  template: >
+    src=application_config.ini.j2
+    dest={{ supervisor_app_config_dir }}/{{ supervisor_app_name }}.ini
+    mode=0644
+    owner=root
+    group=root
+  notify: reload supervisord
+  tags:
+    - configure
+    - supervisor

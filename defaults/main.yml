@@ -1,0 +1,98 @@
+---
+# supervisord settings
+# ====================
+
+supervisor_version: 3.0
+
+# List of dependency packages.
+supervisor_yum_packages:
+  - python-pip
+
+supervisor_pip_packages:
+  - supervisor
+
+# Location of supervisord.conf
+supervisor_config_dir: '/etc/supervisor'
+
+supervisor_config_file: '{{ supervisor_config_dir }}/supervisord.conf'
+
+# Location of applications' config files
+supervisor_app_config_dir: '{{ supervisor_config_dir }}/conf.d'
+
+supervisor_log_dir: '/var/log/supervisor'
+
+supervisor_log: '{{ supervisor_log_dir }}/supervisord.log'
+
+# Maximum log size before it's rotated (suffix multipliers like "KB", 
+# "MB", and "GB" can be used in the value). Set this value to 0 to 
+# indicate an unlimited log size.
+supervisor_max_log_size: '20MB'
+
+# Number of rotated logs to store.
+supervisor_log_backups: 5
+
+supervisor_pid_file: '/var/run/supervisord.pid'
+
+supervisor_socket: '/var/run/supervisord.sock'
+
+# Filesystem permissions of the socket file.
+supervisor_socket_chmod: 0700
+
+
+# Monitored application settings
+# ==============================
+
+# Application's name, used to name the config file.
+# (MANDATORY)
+supervisor_app_name:
+
+# Command (including any arguments) used to start the application.
+# (MANDATORY)
+supervisor_app_command:
+
+# Location of the application's directory.
+# (MANDATORY)
+supervisor_app_directory:
+
+# User account to run the process as.
+# (MANDATORY)
+supervisor_app_user:
+
+supervisor_app_log_dir: '/var/log/{{ supervisor_app_name }}'
+
+supervisor_app_log: '{{ supervisor_app_log_dir }}/{{ supervisor_app_name }}.log'
+
+supervisor_app_error_log: '{{ supervisor_app_log_dir }}/{{ supervisor_app_name }}_error.log'
+
+# Using supervisord's settings as defaults for the next two log related
+# settings.
+supervisor_app_max_log_size: '{{ supervisor_max_log_size }}'
+supervisor_app_log_backups: '{{ supervisor_log_backups }}'
+
+# May be one of 'false', 'unexpected', or 'true'. If false, the process
+# will never be autorestarted. If unexpected, the process will be 
+# restart when the program exits with an exit code that is not one of 
+# the exit codes associated with this process' configuration.
+supervisor_app_autorestart: 'true'
+
+# If true, the application will start automatically when supervisord is
+# started.
+supervisor_app_autostart: 'true'
+
+# The total number of seconds which the application needs to stay 
+# running after a startup to consider the start successful.
+supervisor_app_startsecs: 10
+
+# Attempt to restart the application these many times in case of
+# failures.
+supervisor_app_startretries: 5
+
+supervisor_app_env_vars: {}
+
+# Start these many instances of the application.
+supervisor_app_numprocs: 1
+
+# Refer to the following Note section for more details regarding the
+# next setting:
+# http://supervisord.org/configuration.html#program-x-section-settings
+supervisor_app_process_name: '%(program_name)s_%(process_num)02d'
